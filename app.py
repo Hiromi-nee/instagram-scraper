@@ -9,18 +9,18 @@ import os
 import sys
 import requests
 	
-def crawl(username, photos=[], max_id=None):
+def crawl(username, items=[], max_id=None):
 	url   = 'http://instagram.com/' + username + '/media' + ('?&max_id=' + max_id if max_id is not None else '')
 	media = json.loads(requests.get(url).text)
 	
-	for photo in media['items']:
-		photos.append(photo['images']['standard_resolution']['url'])
+	for curr_item in media['items']:
+		items.append( curr_item[ curr_item['type'] + 's' ]['standard_resolution']['url'] )
 
 	if 'more_available' not in media or media['more_available'] is False:
-		return photos
+		return items
 	else:
 		max_id = media['items'][-1]['id']
-		return crawl(username, photos, max_id)
+		return crawl(username, items, max_id)
 	
 def download(url, save_dir='./'):
 	if not os.path.exists(save_dir):
@@ -37,5 +37,4 @@ def download(url, save_dir='./'):
 if __name__ == '__main__':
 	for url in crawl(sys.argv[1]): 
 		download(url)
-
 
