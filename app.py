@@ -6,8 +6,9 @@ python app.py <username>
 """
 import json
 import os
-import sys
 import requests
+import sys
+
 	
 def crawl(username, items=[], max_id=None):
 	url   = 'http://instagram.com/' + username + '/media' + ('?&max_id=' + max_id if max_id is not None else '')
@@ -33,8 +34,8 @@ def download(url, save_dir='./'):
 		print 'Downloading ' + base_name
 		bytes = requests.get(url).content
 		file.write(bytes)
-
+		
 if __name__ == '__main__':
 	for url in crawl(sys.argv[1]): 
-		download(url)
+		download(url, './' + sys.argv[1])
 
