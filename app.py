@@ -8,15 +8,14 @@ import json
 import os
 import requests
 import sys
+import concurrent.futures
 
-	
 def crawl(username, items=[], max_id=None):
 	url   = 'http://instagram.com/' + username + '/media' + ('?&max_id=' + max_id if max_id is not None else '')
 	media = json.loads(requests.get(url).text)
 	
-	for curr_item in media['items']:
-		items.append( curr_item[ curr_item['type'] + 's' ]['standard_resolution']['url'] )
-
+	items.extend( [ curr_item[ curr_item['type'] + 's' ]['standard_resolution']['url'] for curr_item in media['items'] ] )
+	
 	if 'more_available' not in media or media['more_available'] is False:
 		return items
 	else:
@@ -36,6 +35,14 @@ def download(url, save_dir='./'):
 		file.write(bytes)
 		
 if __name__ == '__main__':
-	for url in crawl(sys.argv[1]): 
-		download(url, './' + sys.argv[1])
+  username = sys.argv[1]
+  
+  with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+    future_to_url = dict( (executor.submit(download, url, './' + username), url) for url in crawl(username) )
+  
+    for future in concurrent.futures.as_completed(future_to_url):
+      url = future_to_url[future]
+      
+      if future.exception() is not None:
+        print '%r generated an exception: %s' % (url, future.exception())
 

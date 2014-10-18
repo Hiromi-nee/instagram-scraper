@@ -1,7 +1,7 @@
 Instagram Scraper
-=======================
+=================
 
-Scrapes an instagram user's photos.
+Scrapes an instagram user's photos. Use responsibly.
 
 Usage
 -----
