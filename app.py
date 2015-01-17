@@ -11,29 +11,29 @@ import sys
 import concurrent.futures
 
 def crawl(username, items=[], max_id=None):
-	url   = 'http://instagram.com/' + username + '/media' + ('?&max_id=' + max_id if max_id is not None else '')
-	media = json.loads(requests.get(url).text)
-	
-	items.extend( [ curr_item[ curr_item['type'] + 's' ]['standard_resolution']['url'] for curr_item in media['items'] ] )
-	
-	if 'more_available' not in media or media['more_available'] is False:
-		return items
-	else:
-		max_id = media['items'][-1]['id']
-		return crawl(username, items, max_id)
-	
+    url   = 'http://instagram.com/' + username + '/media' + ('?&max_id=' + max_id if max_id is not None else '')
+    media = json.loads(requests.get(url).text)
+
+    items.extend( [ curr_item[ curr_item['type'] + 's' ]['standard_resolution']['url'] for curr_item in media['items'] ] )
+
+    if 'more_available' not in media or media['more_available'] is False:
+        return items
+    else:
+        max_id = media['items'][-1]['id']
+        return crawl(username, items, max_id)
+
 def download(url, save_dir='./'):
-	if not os.path.exists(save_dir):
-		os.makedirs(save_dir)
-	
-	base_name = url.split('/')[-1]
-	file_path = os.path.join(save_dir, base_name)
-	
-	with open(file_path, 'wb') as file:
-		print 'Downloading ' + base_name
-		bytes = requests.get(url).content
-		file.write(bytes)
-		
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
+    base_name = url.split('/')[-1]
+    file_path = os.path.join(save_dir, base_name)
+
+    with open(file_path, 'wb') as file:
+        print 'Downloading ' + base_name
+        bytes = requests.get(url).content
+        file.write(bytes)
+
 if __name__ == '__main__':
   username = sys.argv[1]
   
